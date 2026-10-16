@@ -32,7 +32,7 @@ func main() {
 	}
 }
 
-func convertirNombres(mots []string) []string {
+func convertisseurHexEtBin(mots []string) []string {
 	var resultat []string
 
 	for _, mot := range mots {
@@ -60,62 +60,42 @@ func convertirNombres(mots []string) []string {
 	return resultat
 }
 
-// func mettreEnMajuscules(mots []string) []string {
-// 	var resultat []string
 
-// 	for _, mot := range mots {
-// 		if mot == "(up)" && len(resultat) == 0 {
-// 			continue
-// 		}
-
-// 		if mot == "(up)" {
-// 			dernier := len(resultat) - 1
-// 			resultat[dernier] = strings.ToUpper(resultat[dernier])
-// 		} else {
-// 			resultat = append(resultat, mot)
-// 		}
-// 	}
-
-// 	return resultat
-// }
-
-func mettreEnMinuscules(mots []string) []string {
-	var resultat []string
-
-	for _, mot := range mots {
-		if mot == "(low)" && len(resultat) == 0 {
-			continue
-		}
-
-		if mot == "(low)" {
-			dernier := len(resultat) - 1
-			resultat[dernier] = strings.ToLower(resultat[dernier])
-		} else {
-			resultat = append(resultat, mot)
-		}
+func capitaliser(mot string) string {
+	if mot == "" {
+		return mot
 	}
-
-	return resultat
+	lettres := []rune(strings.ToLower(mot))
+	lettres[0] = unicode.ToUpper(lettres[0])
+	return string(lettres)
 }
-func mettrePremiereLettreEnMajuscule(mots []string) []string {
+
+
+func collerPonctuation(mots []string) []string {
 	var resultat []string
 
 	for _, mot := range mots {
-		if mot == "(cap)" && len(resultat) == 0 {
-			continue
-		}
+		// reste : le mot sans la ponctuation du début (",and" donne "and", "!!" donne "")
+		reste := strings.TrimLeft(mot, ".,!?:;")
+		// debut : la ponctuation retirée (",and" donne ",", "!!" donne "!!")
+		debut := mot[:len(mot)-len(reste)]
 
-		if mot == "(cap)" {
+		if debut != "" && len(resultat) > 0 {
 			dernier := len(resultat) - 1
-			lettres := []rune(strings.ToLower(resultat[dernier]))
-			lettres[0] = unicode.ToUpper(lettres[0])
-			resultat[dernier] = string(lettres)
+			resultat[dernier] = resultat[dernier] + debut
+
+			// S'il reste un mot après la ponctuation, on l'ajoute comme mot normal.
+			if reste != "" {
+				resultat = append(resultat, reste)
+			}
 		} else {
 			resultat = append(resultat, mot)
 		}
 	}
 	return resultat
 }
+
+
 func transformer(texte string) string {
 	// On coupe le texte à chaque retour à la ligne : on obtient une liste de lignes.
 	lignes := strings.Split(texte, "\n")
@@ -125,14 +105,11 @@ func transformer(texte string) string {
 		
 		ligne = strings.TrimRight(ligne, "\r")
 
-	
 		mots := strings.Fields(ligne)
 
-		mots = convertirNombres(mots)
+		mots = convertisseurHexEtBin(mots)
 		mots = mettreEnMajuscules(mots)
-		mots = mettreEnMinuscules(mots)
-		mots = mettrePremiereLettreEnMajuscule(mots)
-
+		mots = collerPonctuation(mots)
 		lignes[i] = strings.Join(mots, " ")
 	}
 	return strings.Join(lignes, "\n")
