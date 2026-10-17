@@ -3,8 +3,8 @@ package main
 import ("strings"
 		"strconv"
 )
-
-func mettreEnMajuscules(mots []string) []string {
+// transformationDuMarqueur gère les marqueurs (up), (low), (cap) et leurs versions avec un nombre (up, 2), (low, 2), (cap, 2).
+func transformationDuMarqueur(mots []string) []string {
 	var resultat []string
 
 	for i := 0; i < len(mots); i++ {
